@@ -120,7 +120,7 @@ function createApplication(app_name, path) {
 
 
     mkdir(path + '/src', function(){
-      write(path + '/.babelrc', loadTemplate('js/.babelrc'));
+      write(path + '/.babelrc', loadTemplate('js/babelrc.txt'));
       write(path + '/.eslintignore', loadTemplate('js/.eslintignore'));
       write(path + '/.eslintrc.json', loadTemplate('js/.eslintrc.json'));
       write(path + '/.gitignore', loadTemplate('js/.gitignore'));
