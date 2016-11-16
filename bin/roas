@@ -1,0 +1,388 @@
+#!/usr/bin/env node
+
+var program = require('commander');
+var mkdirp = require('mkdirp');
+var os = require('os');
+var fs = require('fs');
+var path = require('path');
+var readline = require('readline');
+var sortedObject = require('sorted-object');
+
+var _exit = process.exit;
+var eol = os.EOL;
+var pkg = require('../package.json');
+
+var version = pkg.version;
+
+// Re-assign process.exit because of commander
+// TODO: Switch to a different command framework
+process.exit = exit
+
+// CLI
+
+before(program, 'outputHelp', function () {
+  this.allowUnknownOption();
+});
+
+program
+  .version(version)
+  .usage('[options] [dir]')
+  .parse(process.argv);
+
+if (!exit.exited) {
+  main();
+}
+
+/**
+ * Install a before function; AOP.
+ */
+
+function before(obj, method, fn) {
+  var old = obj[method];
+
+  obj[method] = function () {
+    fn.call(this);
+    old.apply(this, arguments);
+  };
+}
+
+/**
+ * Prompt for confirmation on STDOUT/STDIN
+ */
+
+function confirm(msg, callback) {
+  var rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
+
+  rl.question(msg, function (input) {
+    rl.close();
+    callback(/^y|yes|ok|true$/i.test(input));
+  });
+}
+
+/**
+ * Create application at the given directory `path`.
+ *
+ * @param {String} path
+ */
+
+function createApplication(app_name, path) {
+  var wait = 5;
+
+  console.log();
+  function complete() {
+    if (--wait) return;
+    var prompt = launchedFromCmd() ? '>' : '$';
+
+    console.log();
+    console.log('   install dependencies:');
+    console.log('     %s cd %s && npm install', prompt, path);
+    console.log();
+    console.log('   run the app:');
+
+    if (launchedFromCmd()) {
+      console.log('     %s SET DEBUG=roas* & npm start', prompt, app_name);
+    } else {
+      console.log('     %s DEBUG=%s:* npm start', prompt, app_name);
+    }
+
+    console.log();
+  }
+
+  // JavaScript
+  var index = loadTemplate('js/index.js');
+  var app = loadTemplate('js/app.js');
+
+  var config = loadTemplate('js/config/config.js');
+  var database = loadTemplate('js/config/database.js');
+  var test = loadTemplate('js/config/env/test.js');
+  var development = loadTemplate('js/config/env/development.js');
+  var production = loadTemplate('js/config/env/production.js');
+
+  var lib = loadTemplate('js/lib/index.js');
+  var orm = loadTemplate('js/lib/orm.js');
+  var router = loadTemplate('js/lib/router.js');
+
+  var cache = loadTemplate('js/middleware/cache.js');
+
+  var controller = loadTemplate('js/api/controllers/UserController.js');
+  var model = loadTemplate('js/api/models/User.js');
+  var route = loadTemplate('js/api/routes/index.js');
+  var service = loadTemplate('js/api/services/UserService.js');
+
+
+  mkdir(path, function(){
+    mkdir(path + '/log');
+    mkdir(path + '/db');
+    mkdir(path + '/src/api');
+
+
+    mkdir(path + '/src', function(){
+      write(path + '/.babelrc', loadTemplate('js/.babelrc'));
+      write(path + '/.eslintignore', loadTemplate('js/.eslintignore'));
+      write(path + '/.eslintrc.json', loadTemplate('js/.eslintrc.json'));
+      write(path + '/.gitignore', loadTemplate('js/.gitignore'));
+      write(path + '/.sequelizerc', loadTemplate('js/.sequelizerc'));
+      complete();
+    });
+
+    mkdir(path + '/db/migrations', function(){
+      write(path + '/db/migrations/20161116143041-create-user.js', loadTemplate('js/db/migrations/20161116143041-create-user.js'));
+      complete();
+    });
+
+    mkdir(path + '/test', function(){
+      write(path + '/test/bootstrap.test.js', loadTemplate('js/test/bootstrap.test.js'));
+      write(path + '/test/mocha.opts', loadTemplate('js/test/mocha.opts'));
+      complete();
+    });
+
+    mkdir(path + '/test/controllers', function(){
+      write(path + '/test/controllers/UserController.test.js', loadTemplate('js/test/controllers/UserController.test.js'));
+      complete();
+    });
+
+    mkdir(path + '/test/middlewares');
+
+    mkdir(path + '/test/models', function(){
+      write(path + '/test/bootstrap.test.js', loadTemplate('js/test/models/User.test.js'));
+      complete();
+    });
+
+    mkdir(path + '/test/services', function(){
+      write(path + '/test/services/UserService.test.js', loadTemplate('js/test/services/UserService.test.js'));
+      complete();
+    });
+
+
+    mkdir(path + '/src/config', function(){
+      write(path + '/src/config/config.js', config);
+      write(path + '/src/config/database.js', database);
+      complete();
+    });
+
+    mkdir(path + '/src/config/env', function(){
+      write(path + '/src/config/env/test.js', test);
+      write(path + '/src/config/env/development.js', development);
+      write(path + '/src/config/env/production.js', production);
+      complete();
+    });
+
+    mkdir(path + '/src/lib', function(){
+      write(path + '/src/lib/index.js', lib);
+      write(path + '/src/lib/orm.js', orm);
+      write(path + '/src/lib/router.js', router);
+      complete();
+    });
+
+    mkdir(path + '/src/middleware', function(){
+      write(path + '/src/middleware/cache.js', cache);
+      complete();
+    });
+
+    mkdir(path + '/src/api/controllers', function(){
+      write(path + '/src/api/controllers/UserController.js', controller);
+      complete();
+    });
+    
+    mkdir(path + '/src/api/models', function(){
+      write(path + '/src/api/models/User.js', model);
+      complete();
+    });
+
+    mkdir(path + '/src/api/routes', function(){
+      write(path + '/src/api/routes/index.js', route);
+      complete();
+    });
+
+    mkdir(path + '/src/api/services', function(){
+      write(path + '/src/api/services/UserService.js', service);
+      complete();
+    });
+
+    // package.json
+    var pkg = {
+        name: app_name
+      , version: "1.0.0"
+      , description: ""
+      , private: true
+      , main: "index.js"
+      , "scripts": {
+          "start": "./node_modules/.bin/nodemon index.js",
+          "test": "./node_modules/.bin/mocha test/bootstrap.test.js test/**/*.test.js  --opts test/mocha.opts",
+          "pm2": "NODE_ENV=production ./node_modules/.bin/pm2 start index.js -i 2 --name \""+app_name+"\" --max-memory-restart 1024M --merge-logs --log-date-format=\"YYYY-MM-DD HH:mm Z\" --output=\"log/production.log\"",
+          "pm2:restart": "NODE_ENV=production ./node_modules/.bin/pm2 restart \""+app_name+"\"",
+          "pm2:stop": "NODE_ENV=production ./node_modules/.bin/pm2 stop \""+app_name+"\"",
+          "pm2:monit": "NODE_ENV=production ./node_modules/.bin/pm2 monit \""+app_name+"\"",
+          "pm2:logs": "NODE_ENV=production ./node_modules/.bin/pm2 logs \""+app_name+"\"",
+          "lint": "eslint . --ext .js",
+          "db:migrate": "./node_modules/.bin/sequelize db:migrate",
+          "db:rollback": "./node_modules/.bin/sequelize db:migrate:undo",
+          "create:migration": "./node_modules/.bin/sequelize migration:create"
+      }
+      , "dependencies": {
+          "co": "^4.6.0",
+          "debug": "^2.3.2",
+          "koa": "^2.0.0",
+          "koa-bodyparser": "^2.3.0",
+          "koa-convert": "^1.2.0",
+          "koa-json": "^1.1.3",
+          "koa-logger": "^1.3.0",
+          "koa-router": "^7.0.0",
+          "koa-static": "^2.0.0",
+          "lodash": "^4.17.0",
+          "moment": "^2.16.0",
+          "mysql": "^2.12.0",
+          "node-cache": "^4.1.0",
+          "roas-mount": "^1.0.0",
+          "roas-restql": "^1.0.0",
+          "sequelize": "^3.25.0"
+      }
+      , "devDependencies": {
+          "babel-core": "^6.7.5",
+          "babel-plugin-add-module-exports": "^0.1.2",
+          "babel-plugin-transform-es2015-modules-commonjs": "^6.7.4",
+          "babel-polyfill": "^6.1.4",
+          "babel-preset-es2015-node5": "^1.2.0",
+          "babel-preset-stage-3": "^6.5.0",
+          "chai": "^3.5.0",
+          "mocha": "^2.4.5",
+          "nodemon": "^1.9.1",
+          "request": "^2.71.0",
+          "sequelize-cli": "^2.4.0",
+          "should": "^8.3.0",
+          "supertest": "^1.2.0"
+      }
+    }
+
+    // sort dependencies like npm(1)
+    pkg.dependencies = sortedObject(pkg.dependencies);
+
+    // write files
+    write(path + '/package.json', JSON.stringify(pkg, null, 2));
+    write(path + '/index.js', index);
+    write(path + '/src/app.js', app);
+
+    complete();
+  });
+}
+
+function copy_template(from, to) {
+  from = path.join(__dirname, '..', 'templates', from);
+  write(to, fs.readFileSync(from, 'utf-8'));
+}
+
+/**
+ * Check if the given directory `path` is empty.
+ *
+ * @param {String} path
+ * @param {Function} fn
+ */
+
+function emptyDirectory(path, fn) {
+  fs.readdir(path, function(err, files){
+    if (err && 'ENOENT' != err.code) throw err;
+    fn(!files || !files.length);
+  });
+}
+
+/**
+ * Graceful exit for async STDIO
+ */
+
+function exit(code) {
+  // flush output for Node.js Windows pipe bug
+  // https://github.com/joyent/node/issues/6247 is just one bug example
+  // https://github.com/visionmedia/mocha/issues/333 has a good discussion
+  function done() {
+    if (!(draining--)) _exit(code);
+  }
+
+  var draining = 0;
+  var streams = [process.stdout, process.stderr];
+
+  exit.exited = true;
+
+  streams.forEach(function(stream){
+    // submit empty write request and wait for completion
+    draining += 1;
+    stream.write('', done);
+  });
+
+  done();
+}
+
+/**
+ * Determine if launched from cmd.exe
+ */
+
+function launchedFromCmd() {
+  return process.platform === 'win32'
+    && process.env._ === undefined;
+}
+
+/**
+ * Load template file.
+ */
+
+function loadTemplate(name) {
+  return fs.readFileSync(path.join(__dirname, '..', 'templates', name), 'utf-8');
+}
+
+/**
+ * Main program.
+ */
+
+function main() {
+  // Path
+  var destinationPath = program.args.shift() || '.';
+
+  // App name
+  var appName = path.basename(path.resolve(destinationPath));
+
+  // Generate application
+  emptyDirectory(destinationPath, function (empty) {
+    if (empty || program.force) {
+      createApplication(appName, destinationPath);
+    } else {
+      confirm('destination is not empty, continue? [y/N] ', function (ok) {
+        if (ok) {
+          process.stdin.destroy();
+          createApplication(appName, destinationPath);
+        } else {
+          console.error('aborting');
+          exit(1);
+        }
+      });
+    }
+  });
+}
+
+/**
+ * echo str > path.
+ *
+ * @param {String} path
+ * @param {String} str
+ */
+
+function write(path, str, mode) {
+  fs.writeFileSync(path, str, { mode: mode || 0666 });
+  console.log('   \x1b[36mcreate\x1b[0m : ' + path);
+}
+
+/**
+ * Mkdir -p.
+ *
+ * @param {String} path
+ * @param {Function} fn
+ */
+
+function mkdir(path, fn) {
+  mkdirp(path, 0755, function(err){
+    if (err) throw err;
+    console.log('   \033[36mcreate\033[0m : ' + path);
+    fn && fn();
+  });
+}
