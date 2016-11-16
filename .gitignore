@@ -2,6 +2,9 @@
 logs
 *.log
 
+# Git
+.git
+
 # Runtime data
 pids
 *.pid
