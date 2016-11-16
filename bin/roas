@@ -212,6 +212,7 @@ function createApplication(app_name, path) {
       , "scripts": {
           "start": "./node_modules/.bin/nodemon index.js",
           "test": "./node_modules/.bin/mocha test/bootstrap.test.js test/**/*.test.js  --opts test/mocha.opts",
+		  "build": "rd/s/q dist & babel src --out-dir dist --copy-files",
           "pm2": "NODE_ENV=production ./node_modules/.bin/pm2 start index.js -i 2 --name \""+app_name+"\" --max-memory-restart 1024M --merge-logs --log-date-format=\"YYYY-MM-DD HH:mm Z\" --output=\"log/production.log\"",
           "pm2:restart": "NODE_ENV=production ./node_modules/.bin/pm2 restart \""+app_name+"\"",
           "pm2:stop": "NODE_ENV=production ./node_modules/.bin/pm2 stop \""+app_name+"\"",
