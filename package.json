@@ -1,6 +1,6 @@
 {
   "name": "roas-generator",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "fullstack roas generator for roas server framework",
   "scripts": {
     "start": "npm publish ."
