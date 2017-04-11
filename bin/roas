@@ -4,7 +4,7 @@ var program = require('commander');
 var mkdirp = require('mkdirp');
 var os = require('os');
 var fs = require('fs');
-var path = require('path');
+var _path = require('path');
 var readline = require('readline');
 var sortedObject = require('sorted-object');
 
@@ -138,22 +138,22 @@ function createApplication(app_name, path) {
     });
 
     mkdir(path + '/src/api', function () {
-      copy(path + '/src/middleware', path.join(__dirname, '..', 'templates', 'js', 'api'));
+      copy(path + '/src/middleware', _path.join(__dirname, '..', 'templates', 'js', 'api'));
       complete();
     });
 
     mkdir(path + '/src/config', function () {
-      copy(path + '/src/config', path.join(__dirname, '..', 'templates', 'js', 'config'));
+      copy(path + '/src/config', _path.join(__dirname, '..', 'templates', 'js', 'config'));
       complete();
     });
 
     mkdir(path + '/src/lib', function () {
-      copy(path + '/src/lib', path.join(__dirname, '..', 'templates', 'js', 'lib'));
+      copy(path + '/src/lib', _path.join(__dirname, '..', 'templates', 'js', 'lib'));
       complete();
     });
 
     mkdir(path + '/src/middleware', function () {
-      copy(path + '/src/middleware', path.join(__dirname, '..', 'templates', 'js', 'middleware'));
+      copy(path + '/src/middleware', _path.join(__dirname, '..', 'templates', 'js', 'middleware'));
       complete();
     });
 
