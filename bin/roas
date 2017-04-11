@@ -98,7 +98,6 @@ function createApplication(app_name, path) {
 
   mkdir(path, function () {
     mkdir(path + '/log');
-    mkdir(path + '/db');
 
     mkdir(path + '/src', function () {
       write(path + '/.babelrc', loadTemplate('js/.babelrc'));
@@ -109,51 +108,33 @@ function createApplication(app_name, path) {
       complete();
     });
 
-    mkdir(path + '/db/migrations', function () {
-      write(path + '/db/migrations/20161116143041-create-user.js', loadTemplate('js/db/migrations/20161116143041-create-user.js'));
+    mkdir(path + '/db', function () {
+      copy(_path.join(__dirname, '..', 'templates', 'js', 'db'), path + '/db');
       complete();
     });
 
     mkdir(path + '/test', function () {
-      write(path + '/test/bootstrap.test.js', loadTemplate('js/test/bootstrap.test.js'));
-      write(path + '/test/mocha.opts', loadTemplate('js/test/mocha.opts'));
-      complete();
-    });
-
-    mkdir(path + '/test/controllers', function () {
-      write(path + '/test/controllers/UserController.test.js', loadTemplate('js/test/controllers/UserController.test.js'));
-      complete();
-    });
-
-    mkdir(path + '/test/middlewares');
-
-    mkdir(path + '/test/models', function () {
-      write(path + '/test/bootstrap.test.js', loadTemplate('js/test/models/User.test.js'));
-      complete();
-    });
-
-    mkdir(path + '/test/services', function () {
-      write(path + '/test/services/UserService.test.js', loadTemplate('js/test/services/UserService.test.js'));
+      copy(_path.join(__dirname, '..', 'templates', 'js', 'test'), path + '/test');
       complete();
     });
 
     mkdir(path + '/src/api', function () {
-      copy(path + '/src/middleware', _path.join(__dirname, '..', 'templates', 'js', 'api'));
+      copy(_path.join(__dirname, '..', 'templates', 'js', 'api'), path + '/src/api');
       complete();
     });
 
     mkdir(path + '/src/config', function () {
-      copy(path + '/src/config', _path.join(__dirname, '..', 'templates', 'js', 'config'));
+      copy(_path.join(__dirname, '..', 'templates', 'js', 'config'), path + '/src/config');
       complete();
     });
 
     mkdir(path + '/src/lib', function () {
-      copy(path + '/src/lib', _path.join(__dirname, '..', 'templates', 'js', 'lib'));
+      copy(_path.join(__dirname, '..', 'templates', 'js', 'lib'), path + '/src/lib');
       complete();
     });
 
     mkdir(path + '/src/middleware', function () {
-      copy(path + '/src/middleware', _path.join(__dirname, '..', 'templates', 'js', 'middleware'));
+      copy(_path.join(__dirname, '..', 'templates', 'js', 'middleware'), path + '/src/middleware');
       complete();
     });
 
@@ -350,7 +331,7 @@ function copy(src, dst) {
       var _src = src + '/' + path,
         _dst = dst + '/' + path,
         readable, writable;
-      stat(_src, function (err, st) {
+      fs.stat(_src, function (err, st) {
         if (err) {
           throw err;
         }
