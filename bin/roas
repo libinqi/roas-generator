@@ -92,7 +92,7 @@ function createApplication(app_name, path) {
     console.log();
   }
 
-  JavaScript
+  // JavaScript
   var index = loadTemplate('js/index.js');
   var app = loadTemplate('js/app.js');
 
