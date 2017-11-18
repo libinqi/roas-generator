@@ -97,8 +97,6 @@ function createApplication(app_name, path) {
   var app = loadTemplate('js/app.js');
 
   mkdir(path, function () {
-    mkdir(path + '/log');
-
     mkdir(path + '/src', function () {
       write(path + '/.babelrc', loadTemplate('js/.babelrc'));
       write(path + '/.eslintignore', loadTemplate('js/.eslintignore'));
