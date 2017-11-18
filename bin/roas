@@ -105,6 +105,10 @@ function createApplication(app_name, path) {
       write(path + '/.eslintrc.json', loadTemplate('js/.eslintrc.json'));
       write(path + '/.gitignore', loadTemplate('js/gitignore.txt'));
       write(path + '/.sequelizerc', loadTemplate('js/.sequelizerc'));
+	  write(path + '/pm2_publish.bat', loadTemplate('js/pm2_publish.bat'));
+	  write(path + '/pm2_publish.sh', loadTemplate('js/pm2_publish.sh'));
+	  write(path + '/README.md', loadTemplate('js/README.md'));
+	  write(path + '/README_CN.md', loadTemplate('js/README_CN.md'));
       complete();
     });
 
