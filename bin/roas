@@ -191,7 +191,8 @@ function createApplication(app_name, path) {
 		"koa-json": "^2.0.2",
 		"koa-jwt": "^3.2.2",
 		"koa-multer": "^1.0.2",
-		"koa-router": "^7.3.0",
+    "koa-router": "^7.3.0",
+    "koa-socket.io": "^1.1.2",
 		"koa-static": "^4.0.2",
 		"lodash": "^4.17.4",
 		"log4js": "^2.3.12",
@@ -235,14 +236,24 @@ function createApplication(app_name, path) {
 				"DATABASE_USERNAME_DEV":"root",
 				"DATABASE_PASSWORD_DEV":"123456",
 				"DATABASE_NAME_DEV":"roas_dev",
-				"DATABASE_HOST_DEV":"localhost"
+				"DATABASE_HOST_DEV":"localhost",
+        "HTTP_ENABLE": true,
+        "WS_ENABLE": false,
+        "TCP_ENABLE": false,
+        "HTTP_PROVIDER": "",
+        "TCP_PROVIDER": ""
 			},
 			"env_production": {
 				"NODE_ENV": "production",
 				"DATABASE_USERNAME_PRO":"root",
 				"DATABASE_PASSWORD_PRO":"123456",
 				"DATABASE_NAME_PRO":"roas",
-				"DATABASE_HOST_PRO":"localhost"
+				"DATABASE_HOST_PRO":"localhost",
+        "HTTP_ENABLE": true,
+        "WS_ENABLE": false,
+        "TCP_ENABLE": false,
+        "HTTP_PROVIDER": "",
+        "TCP_PROVIDER": ""
 			}
 		}]
 	};
