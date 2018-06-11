@@ -243,7 +243,7 @@ function createApplication(app_name, path) {
     };
 
     // write files
-    write(path + '/.gitignore', loadTemplate('js/.gitignore'));
+    write(path + '/.gitignore', loadTemplate('js/gitignore.txt'));
     write(path + '/.sequelizerc', loadTemplate('js/.sequelizerc'));
     write(path + '/pm2_publish.bat', loadTemplate('js/pm2_publish.bat'));
     write(path + '/pm2_publish.sh', loadTemplate('js/pm2_publish.sh'));
