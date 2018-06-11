@@ -92,21 +92,9 @@ function createApplication(app_name, path) {
     console.log();
   }
 
-  // JavaScript
-  var index = loadTemplate('js/index.js');
-  var app = loadTemplate('js/app.js');
-
   mkdir(path, function () {
-    mkdir(path + '/src', function () {
-      write(path + '/.babelrc', loadTemplate('js/.babelrc'));
-      write(path + '/.eslintignore', loadTemplate('js/.eslintignore'));
-      write(path + '/.eslintrc.json', loadTemplate('js/.eslintrc.json'));
-      write(path + '/.gitignore', loadTemplate('js/gitignore.txt'));
-      write(path + '/.sequelizerc', loadTemplate('js/.sequelizerc'));
-	  write(path + '/pm2_publish.bat', loadTemplate('js/pm2_publish.bat'));
-	  write(path + '/pm2_publish.sh', loadTemplate('js/pm2_publish.sh'));
-	  write(path + '/README.md', loadTemplate('js/README.md'));
-	  write(path + '/README_CN.md', loadTemplate('js/README_CN.md'));
+    mkdir(path + '/.vscode', function () {
+      copy(_path.join(__dirname, '..', 'templates', 'js', '.vscode'), path + '/.vscode');
       complete();
     });
 
@@ -120,149 +108,154 @@ function createApplication(app_name, path) {
       complete();
     });
 
-    mkdir(path + '/src/api', function () {
-      copy(_path.join(__dirname, '..', 'templates', 'js', 'api'), path + '/src/api');
-      complete();
-    });
-
-    mkdir(path + '/src/config', function () {
-      copy(_path.join(__dirname, '..', 'templates', 'js', 'config'), path + '/src/config');
-      complete();
-    });
-
-    mkdir(path + '/src/lib', function () {
-      copy(_path.join(__dirname, '..', 'templates', 'js', 'lib'), path + '/src/lib');
-      complete();
-    });
-
-    mkdir(path + '/src/middleware', function () {
-      copy(_path.join(__dirname, '..', 'templates', 'js', 'middleware'), path + '/src/middleware');
+    mkdir(path + '/src', function () {
+      copy(_path.join(__dirname, '..', 'templates', 'js', 'src'), path + '/src');
       complete();
     });
 
     // package.json
     var pkg = {
-      name: app_name,
-      version: "1.0.0",
-      description: "",
-      private: true,
+      "name": "roas.js",
+      "version": "3.0.0",
+      "description": "A Web App like Ruby on Rails with Koa2, ES6 and Sequelize",
+      "private": true,
       "main": "index.js",
-	  "scripts": {
-		"start": "./node_modules/.bin/nodemon --harmony index.js",
-		"test": "./node_modules/.bin/mocha test/bootstrap.test.js test/**/*.test.js  --opts test/mocha.opts",
-		"build": "rd/s/q dist & babel src --out-dir dist --copy-files",
-		"pm2": "cross-env NODE_ENV=production pm2 start index.js -i 2 --name \"roas\" --max-memory-restart 1024M --merge-logs --log-date-format=\"YYYY-MM-DD HH:mm Z\" --output=\"log/production.log\"",
-		"pm2:restart": "cross-env NODE_ENV=production pm2 restart \"roas\"",
-		"pm2:stop": "cross-env NODE_ENV=production pm2 stop \"roas\"",
-		"pm2:monit": "cross-env NODE_ENV=production pm2 monit \"roas\"",
-		"pm2:logs": "cross-env NODE_ENV=production pm2 logs \"roas\"",
-		"lint": "eslint . --ext .js",
-		"db:migrate": "./node_modules/.bin/sequelize db:migrate",
-		"db:rollback": "./node_modules/.bin/sequelize db:migrate:undo",
-		"create:migration": "./node_modules/.bin/sequelize migration:create"
-	  },
-	  "repository": {
-		"type": "git",
-		"url": "git+https://github.com/libinqi/roas.js.git"
-	  },
-	  "keywords": [
-		"koa2",
-		"orm",
-		"babel",
-		"es6"
-	  ],
-	  "author": "libinqi",
-	  "license": "MIT",
-	  "bugs": {
-		"url": "https://github.com/libinqi/roas.js.git/issues"
-	  },
-	  "engines": {
-		"node": ">= 7.0.0"
-	  },
-	  "homepage": "https://github.com/libinqi/roas.js.git#readme",
-	  "dependencies": {
-		"co": "^4.6.0",
-		"debug": "^3.1.0",
-		"formidable": "^1.1.1",
-		"koa": "^2.4.1",
-		"koa-bodyparser": "^4.2.0",
-		"koa-convert": "^1.2.0",
-		"koa-cors": "0.0.16",
-		"koa-json": "^2.0.2",
-		"koa-jwt": "^3.2.2",
-		"koa-multer": "^1.0.2",
-    "koa-router": "^7.3.0",
-    "koa-socket.io": "^1.1.2",
-		"koa-static": "^4.0.2",
-		"lodash": "^4.17.4",
-		"log4js": "^2.3.12",
-		"moment": "^2.19.2",
-		"multer": "^1.3.0",
-		"mysql2": "^1.5.0",
-		"node-cache": "^4.1.1",
-		"roas-mount": "^1.0.0",
-		"roas-restql": "^1.0.7",
-		"sequelize": "^4.22.7"
-	  },
-	  "devDependencies": {
-		"babel-core": "^6.26.0",
-		"babel-polyfill": "^6.26.0",
-		"babel-preset-es2017-node7": "^0.5.2",
-		"chai": "^4.1.2",
-		"cross-env": "^5.1.1",
-		"mocha": "^4.0.1",
-		"nodemon": "^1.12.1",
-		"request": "^2.83.0",
-		"sequelize-cli": "^3.0.0",
-		"should": "^13.1.3",
-		"skipper-disk": "^0.5.10",
-		"supertest": "^3.0.0"
-	  }
+      "scripts": {
+        "start": "cross-env NODE_ENV=development ./node_modules/.bin/nodemon -e ts -r ts-node/register src/app.ts",
+        "test": "./node_modules/.bin/mocha test/bootstrap.test.ts  --opts test/mocha.opts",
+        "build": "rd/s/q dist & tsc",
+        "pm2": "pm2 start process.json --env production",
+        "lint": "tslint -c tslint.json -p tsconfig.json",
+        "db:migrate": "./node_modules/.bin/sequelize db:migrate",
+        "db:rollback": "./node_modules/.bin/sequelize db:migrate:undo",
+        "create:migration": "./node_modules/.bin/sequelize migration:create"
+      },
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/libinqi/roas.js.git"
+      },
+      "keywords": [
+        "koa2",
+        "typescript",
+        "sequelize"
+      ],
+      "author": "libinqi",
+      "license": "MIT",
+      "bugs": {
+        "url": "https://github.com/libinqi/roas.js.git/issues"
+      },
+      "engines": {
+        "node": ">= 8.6.0"
+      },
+      "homepage": "https://github.com/libinqi/roas.js.git#readme",
+      "dependencies": {
+        "co": "^4.6.0",
+        "debug": "^3.1.0",
+        "formidable": "^1.2.1",
+        "koa": "^2.5.1",
+        "koa-bodyparser": "^4.2.1",
+        "koa-convert": "^1.2.0",
+        "koa-cors": "0.0.16",
+        "koa-json": "^2.0.2",
+        "koa-jwt": "^3.3.2",
+        "koa-multer": "^1.0.2",
+        "koa-router": "^7.4.0",
+        "koa-socket.io": "^1.1.2",
+        "koa-static": "^4.0.3",
+        "lodash": "^4.17.10",
+        "log4js": "^2.8.0",
+        "moment": "^2.22.2",
+        "multer": "^1.3.0",
+        "mysql2": "^1.5.3",
+        "node-cache": "^4.2.0",
+        "request": "^2.87.0",
+        "roas-mount": "^1.0.3",
+        "roas-restql": "^1.0.7",
+        "sequelize": "^4.37.10"
+      },
+      "devDependencies": {
+        "@types/chai": "^4.1.3",
+        "@types/koa": "^2.0.46",
+        "@types/koa-bodyparser": "^4.2.0",
+        "@types/koa-json": "^2.0.18",
+        "@types/koa-jwt": "^3.3.0",
+        "@types/koa-router": "^7.0.28",
+        "@types/mocha": "^5.2.1",
+        "@types/node": "^10.3.1",
+        "@types/sequelize": "^4.27.20",
+        "@types/supertest": "^2.0.4",
+        "chai": "^4.1.2",
+        "cross-env": "^5.1.6",
+        "mocha": "^4.1.0",
+        "nodemon": "^1.17.5",
+        "sequelize-cli": "^3.2.0",
+        "should": "^13.2.1",
+        "skipper-disk": "^0.5.11",
+        "supertest": "^3.1.0",
+        "ts-node": "^6.1.0",
+        "tslint": "^5.10.0",
+        "typescript": "^2.9.1"
+      },
+      "nodemonConfig": {
+        "ignore": [
+          "public/*",
+          "logs/*"
+        ]
+      }
     }
 
     // sort dependencies like npm(1)
     pkg.dependencies = sortedObject(pkg.dependencies);
-	
-	// process.json
+
+    // process.json
     var process = {
-		"apps": [{
-			"name": app_name,
-			"script": "app.js",
-			"node_args": "-harmony",
-			"watch": false,
-			"log_date_format": "YYYY-MM-DD HH:mm:ss",
-			"env": {
-				"NODE_ENV": "development",
-				"DATABASE_USERNAME_DEV":"root",
-				"DATABASE_PASSWORD_DEV":"123456",
-				"DATABASE_NAME_DEV":"roas_dev",
-				"DATABASE_HOST_DEV":"localhost",
-        "HTTP_ENABLE": true,
-        "WS_ENABLE": false,
-        "TCP_ENABLE": false,
-        "HTTP_PROVIDER": "",
-        "TCP_PROVIDER": ""
-			},
-			"env_production": {
-				"NODE_ENV": "production",
-				"DATABASE_USERNAME_PRO":"root",
-				"DATABASE_PASSWORD_PRO":"123456",
-				"DATABASE_NAME_PRO":"roas",
-				"DATABASE_HOST_PRO":"localhost",
-        "HTTP_ENABLE": true,
-        "WS_ENABLE": false,
-        "TCP_ENABLE": false,
-        "HTTP_PROVIDER": "",
-        "TCP_PROVIDER": ""
-			}
-		}]
-	};
+      "apps": [{
+        "name": "roas.js",
+        "script": "app.js",
+        "node_args": "-harmony",
+        "watch": false,
+        "log_date_format": "YYYY-MM-DD HH:mm:ss",
+        "env": {
+          "NODE_ENV": "development",
+          "DATABASE_USERNAME_DEV": "root",
+          "DATABASE_PASSWORD_DEV": "123456",
+          "DATABASE_NAME_DEV": "roas_dev",
+          "DATABASE_HOST_DEV": "localhost",
+          "HTTP_ENABLE": true,
+          "WS_ENABLE": false,
+          "TCP_ENABLE": false,
+          "HTTP_PROVIDER": "",
+          "TCP_PROVIDER": ""
+        },
+        "env_production": {
+          "NODE_ENV": "production",
+          "DATABASE_USERNAME_PRO": "root",
+          "DATABASE_PASSWORD_PRO": "123456",
+          "DATABASE_NAME_PRO": "roas",
+          "DATABASE_HOST_PRO": "localhost",
+          "HTTP_ENABLE": true,
+          "WS_ENABLE": false,
+          "TCP_ENABLE": false,
+          "HTTP_PROVIDER": "",
+          "TCP_PROVIDER": ""
+        }
+      }]
+    };
 
     // write files
-	write(path + '/process.json', JSON.stringify(process, null, 2));
+    write(path + '/.gitignore', loadTemplate('js/.gitignore'));
+    write(path + '/.sequelizerc', loadTemplate('js/.sequelizerc'));
+    write(path + '/pm2_publish.bat', loadTemplate('js/pm2_publish.bat'));
+    write(path + '/pm2_publish.sh', loadTemplate('js/pm2_publish.sh'));
+    write(path + '/process.json', JSON.stringify(process, null, 2));
     write(path + '/package.json', JSON.stringify(pkg, null, 2));
-    write(path + '/index.js', index);
-    write(path + '/src/app.js', app);
+    write(path + '/README.md', loadTemplate('js/README.md'));
+    write(path + '/README_CN.md', loadTemplate('js/README_CN.md'));
+    write(path + '/tsconfig.json', loadTemplate('js/tsconfig.json'));
+    write(path + '/tslint.json', loadTemplate('js/tslint.json'));
+
+    // JavaScript
+    write(path + '/index.js', loadTemplate('js/index.js'));
 
     complete();
   });
