@@ -103,11 +103,6 @@ function createApplication(app_name, path) {
       complete();
     });
 
-    mkdir(path + '/public', function () {
-      copy(_path.join(__dirname, '..', 'templates', 'js', 'public'), path + '/public');
-      complete();
-    });
-
     mkdir(path + '/test', function () {
       copy(_path.join(__dirname, '..', 'templates', 'js', 'test'), path + '/test');
       complete();
@@ -121,7 +116,7 @@ function createApplication(app_name, path) {
     // package.json
     var pkg = {
       "name": app_name,
-      "version": "3.0.0",
+      "version": "1.0.0",
       "description": "A Web App like Ruby on Rails with Koa2, ES6 and Sequelize",
       "private": true,
       "main": "index.js",
@@ -172,7 +167,7 @@ function createApplication(app_name, path) {
         "multer": "^1.3.0",
         "mysql2": "^1.5.3",
         "node-cache": "^4.2.0",
-		"reflect-metadata": "^0.1.12",
+		    "reflect-metadata": "^0.1.12",
         "request": "^2.87.0",
         "roas-mount": "^1.0.3",
         "roas-restql": "^1.0.7",
@@ -218,15 +213,17 @@ function createApplication(app_name, path) {
       "apps": [{
         "name": app_name,
         "script": "app.js",
-        "node_args": "-harmony",
+        "node_args": "--harmony",
         "watch": false,
         "log_date_format": "YYYY-MM-DD HH:mm:ss",
         "env": {
           "NODE_ENV": "development",
-          "DATABASE_USERNAME_DEV": "root",
-          "DATABASE_PASSWORD_DEV": "123456",
-          "DATABASE_NAME_DEV": "roas_dev",
-          "DATABASE_HOST_DEV": "localhost",
+          "DATABASE_USERNAME": "root",
+          "DATABASE_PASSWORD": "123456",
+          "DATABASE_NAME": "roas_dev",
+          "DATABASE_HOST": "localhost",
+          "HOST_NAME": "localhost",
+          "HOST_IP": "127.0.0.1",
           "HTTP_ENABLE": true,
           "WS_ENABLE": false,
           "TCP_ENABLE": false,
@@ -235,10 +232,12 @@ function createApplication(app_name, path) {
         },
         "env_production": {
           "NODE_ENV": "production",
-          "DATABASE_USERNAME_PRO": "root",
-          "DATABASE_PASSWORD_PRO": "123456",
-          "DATABASE_NAME_PRO": "roas",
-          "DATABASE_HOST_PRO": "localhost",
+          "DATABASE_USERNAME": "root",
+          "DATABASE_PASSWORD": "123456",
+          "DATABASE_NAME": "roas",
+          "DATABASE_HOST": "localhost",
+          "HOST_NAME": "localhost",
+          "HOST_IP": "127.0.0.1",
           "HTTP_ENABLE": true,
           "WS_ENABLE": false,
           "TCP_ENABLE": false,
